@@ -1,6 +1,9 @@
 source 'https://rubygems.org'
 ruby '2.0.0'
 
+ # added to get guard to work on Windows
+ require 'rbconfig'
+
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.0.0'
 #ruby-gemset=railstutorial_rails_4_0
@@ -16,10 +19,13 @@ group :development, :test do
   gem 'sqlite3', '1.3.8'
   gem 'rspec-rails', '2.13.1'
   # The following optional lines are part of the advanced setup.
-  # gem 'guard-rspec', '2.5.0'
-  # gem 'spork-rails', github: 'sporkrb/spork-rails'
-  # gem 'guard-spork', '1.5.0'
-  # gem 'childprocess', '0.3.6'
+  gem 'guard-rspec', '2.5.0'
+  gem 'spork-rails', github: 'sporkrb/spork-rails'
+  gem 'guard-spork', '1.5.0'
+  gem 'childprocess', '0.3.6'
+  
+  # added to get guard to work on Windows
+  gem 'wdm', '>= 0.1.0' if RbConfig::CONFIG['target_os'] =~ /mswin|mingw/i
 end
 
 group :test do
@@ -37,7 +43,7 @@ group :test do
 
   # Uncomment these lines on Windows.
   gem 'rb-notifu', '0.0.4'
-  #gem 'win32console', '1.3.2'
+  # gem 'win32console', '1.3.2'
 end
 
 # Use SCSS for stylesheets
