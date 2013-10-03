@@ -20,16 +20,62 @@ describe "Static pages" do
 
     describe "for signed-in users" do
       let(:user) { FactoryGirl.create(:user) }
+      let(:other_user) { FactoryGirl.create(:user)}
       before do
-        FactoryGirl.create(:micropost, user: user, content: "Lorem ipsum")
-        FactoryGirl.create(:micropost, user: user, content: "Dolor sit amet")
+        31.times {  FactoryGirl.create(:micropost, user: user,
+                      content: "Lorem ipsum") }
+# TODO add microposts from other_user to user.feed
+        FactoryGirl.create(:micropost, user: other_user, 
+          content: "Dolor sit amet")
+
         sign_in user
         visit root_path
       end
 
-      it "should render the user's feed" do
-        user.feed.each do |item|
+      it "pagination" do
+        should have_selector('div.pagination') 
+      end
+
+      it "should render the user's feed with pagination" do
+        user.feed.paginate(page: 1).each do |item|
           expect(page).to have_selector("li##{item.id}", text: item.content)
+        end
+      end
+
+      describe "delete link" do
+        it "for own microposts" do 
+          should have_link('delete', href: micropost_path(user.
+                                          microposts.first))
+        end
+        
+        it "for other user's microposts" do 
+          pending("add microposts from other_user to user.feed")
+          should_not have_link('delete', href: micropost_path(other_user.
+                                          microposts.first)) 
+        end
+      end
+
+      describe "micropost pluralization" do
+        it "with several microposts" do
+          should have_content("#{user.microposts.count} microposts")
+        end
+
+        describe "with one micropost" do
+          before do 
+            user.microposts.first.destroy
+            visit root_path
+          end
+
+          it { should have_content("#{user.microposts.count} micropost") }
+        end
+
+        describe "with no microposts" do
+          before do 
+            user.microposts.delete_all
+            visit root_path
+          end
+
+          it { should have_content("#{user.microposts.count} microposts") }
         end
       end
     end

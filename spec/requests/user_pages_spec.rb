@@ -72,6 +72,16 @@ describe "User pages" do
       it { should have_content(m1.content) }
       it { should have_content(m2.content) }
       it { should have_content(user.microposts.count) }
+      it { should have_content("Microposts (2)")}
+      
+      describe "with only one micropost" do
+        before do
+          m2.destroy
+          visit user_path(user)
+        end
+
+        it { should have_content("Micropost (1)") }
+      end
     end
   end
 
