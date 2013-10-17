@@ -22,11 +22,12 @@ describe "Static pages" do
       let(:user) { FactoryGirl.create(:user) }
       let(:other_user) { FactoryGirl.create(:user)}
       before do
-        31.times {  FactoryGirl.create(:micropost, user: user,
-                      content: "Lorem ipsum") }
-# TODO add microposts from other_user to user.feed
-        FactoryGirl.create(:micropost, user: other_user, 
-          content: "Dolor sit amet")
+        16.times {  FactoryGirl.create(:micropost, user: user,
+                      content: "Lorem ipsum") 
+                    FactoryGirl.create(:micropost, user: other_user, 
+                      content: "Dolor sit amet") }
+        user.follow!(other_user)
+        other_user.follow!(user)
 
         sign_in user
         visit root_path
@@ -42,6 +43,13 @@ describe "Static pages" do
         end
       end
 
+      describe "follower/following counts" do
+
+        it { should have_link("1 following", href: following_user_path(user)) }
+        it { should have_link("1 followers", href: followers_user_path(user)) }
+      end
+
+
       describe "delete link" do
         it "for own microposts" do 
           should have_link('delete', href: micropost_path(user.
@@ -49,7 +57,6 @@ describe "Static pages" do
         end
         
         it "for other user's microposts" do 
-          pending("add microposts from other_user to user.feed")
           should_not have_link('delete', href: micropost_path(other_user.
                                           microposts.first)) 
         end
